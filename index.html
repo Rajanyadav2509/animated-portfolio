@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-5W765FSF"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+</script>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="color-scheme" content="dark" />
@@ -61,23 +67,26 @@
       var(--bg);
   }
 
-  /* ---------- preloader (video opening: % counter + line) ---------- */
+  /* ---------- human verification gate (replaces the preloader counter) ---------- */
   #loader{
     position:fixed; inset:0; z-index:200; background:#050505;
     display:flex; align-items:center; justify-content:center;
     transition:transform .9s cubic-bezier(.76,0,.24,1);
   }
   #loader.done{ transform:translateY(-101%); }
-  #loader .pct{
-    position:absolute; left:4vw; top:3vh;
-    font-family:var(--disp); font-size:clamp(64px,10vw,120px); line-height:1; color:var(--ink);
-  }
-  #loader .pct sup{ color:var(--red); font-size:.45em; }
-  #loader .line{
-    font-size:clamp(11px,1.6vw,14px); letter-spacing:.42em; text-transform:uppercase; color:var(--muted);
-    text-align:center; padding:0 20px;
-  }
-  #loader .bar{ position:absolute; left:0; bottom:0; height:3px; background:var(--red); width:0%; box-shadow:0 0 18px var(--red-glow); }
+  .vgate{ width:min(480px,92vw); text-align:center; padding:0 20px; }
+  .vgate-title{ font-family:var(--disp); font-size:clamp(28px,5vw,40px); line-height:1.1; color:var(--ink); margin:0 0 10px; }
+  .vgate-sub{ font-size:14px; color:var(--muted); margin:0 0 22px; letter-spacing:.04em; }
+  .vgate-check{ display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; color:var(--ink); cursor:pointer; background:#111; border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .vgate-check input{ width:20px; height:20px; accent-color:var(--red); cursor:pointer; flex:none; }
+  .vgate-math{ display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px; font-weight:600; color:var(--muted); }
+  .vgate-math span{ font-size:20px; color:var(--ink); }
+  .vgate-math input{ width:90px; padding:10px; background:#111; border:1px solid var(--line); border-radius:10px; color:var(--ink); font:inherit; text-align:center; }
+  .vgate-math input:focus{ outline:none; border-color:var(--red); }
+  .vgate-err{ margin:14px 0 0; color:#ff6b6b; font-weight:600; font-size:14px; }
+  .vgate-btn{ margin-top:20px; width:100%; min-height:48px; border:0; cursor:pointer; font-weight:700; font-size:14px; letter-spacing:.12em; text-transform:uppercase; background:var(--red); color:#fff; clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px); transition:background .25s, transform .25s; }
+  .vgate-btn:hover{ background:var(--red2); transform:translateY(-1px); }
+  .vgate.invalid .vgate-check, .vgate.invalid .vgate-math input{ border-color:#ff6b6b; }
 
   /* ---------- nav ---------- */
   header{
@@ -924,11 +933,16 @@
 <div class="vignette" aria-hidden="true"></div>
 <canvas id="embers" aria-hidden="true"></canvas>
 
-<!-- Preloader — same as the video: counter + line, then wipe -->
-<div id="loader" role="status" aria-label="Loading">
-  <div class="pct"><span id="pctNum">0</span><sup>%</sup></div>
-  <p class="line">Every post drives real growth</p>
-  <div class="bar" id="loadBar"></div>
+<!-- Human verification gate — confirm you're not a robot to enter -->
+<div id="loader" role="dialog" aria-label="Human verification">
+  <div class="vgate">
+    <h2 class="vgate-title">Verify you're human</h2>
+    <p class="vgate-sub">Please confirm you're not a robot to enter the portfolio.</p>
+    <label class="vgate-check"><input type="checkbox" id="vgCheck"> <span>I'm not a robot</span></label>
+    <div class="vgate-math"><span id="vgSum">3 + 4 =</span><input type="number" id="vgAnswer" inputmode="numeric" autocomplete="off" placeholder="?" aria-label="Your answer"></div>
+    <p class="vgate-err" id="vgErr" hidden></p>
+    <button class="vgate-btn" id="vgEnter" type="button">Enter portfolio</button>
+  </div>
 </div>
 
 <header id="siteHeader">
@@ -1452,11 +1466,14 @@
   "use strict";
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---------- preloader: counter like the video ---------- */
+  /* ---------- human verification gate (replaces the preloader counter) ---------- */
   var loader = document.getElementById("loader");
-  var pctNum = document.getElementById("pctNum");
-  var loadBar = document.getElementById("loadBar");
-  var p = 0;
+  var vgCheck = document.getElementById("vgCheck");
+  var vgSum = document.getElementById("vgSum");
+  var vgAnswer = document.getElementById("vgAnswer");
+  var vgErr = document.getElementById("vgErr");
+  var vgEnter = document.getElementById("vgEnter");
+  var a = 0, b = 0;
   function finishLoad(){
     document.body.classList.add("loaded");
     loader.classList.add("done");
@@ -1467,17 +1484,42 @@
       document.querySelectorAll(".rv:not(.in), .stat:not(.in), .wcard:not(.in)").forEach(function(el){ el.classList.add("in"); });
     }, 2600);
   }
-  if (reduced) {
-    pctNum.textContent = "100"; loadBar.style.width = "100%"; finishLoad();
+  function newSum(){
+    a = 2 + Math.floor(Math.random() * 8);
+    b = 2 + Math.floor(Math.random() * 8);
+    if (vgSum) vgSum.textContent = a + " + " + b + " =";
+    if (vgAnswer) vgAnswer.value = "";
+  }
+  function verified(){
+    try { return sessionStorage.getItem("human-verified") === "1"; } catch (e) { return false; }
+  }
+  function verify(){
+    var card = document.querySelector(".vgate");
+    if (card) card.classList.remove("invalid");
+    if (!vgCheck || !vgCheck.checked) {
+      if (vgErr) { vgErr.textContent = "Please tick \"I'm not a robot\" to continue."; vgErr.hidden = false; }
+      if (card) card.classList.add("invalid");
+      return;
+    }
+    var ans = parseInt(vgAnswer && vgAnswer.value, 10);
+    if (ans !== a + b) {
+      if (vgErr) { vgErr.textContent = "That answer is not right — please try the new sum."; vgErr.hidden = false; }
+      if (card) card.classList.add("invalid");
+      newSum();
+      return;
+    }
+    try { sessionStorage.setItem("human-verified", "1"); } catch (e) {}
+    finishLoad();
+  }
+  if (reduced || verified()) {
+    finishLoad();
   } else {
-    var tick = setInterval(function(){
-      p += Math.floor(Math.random() * 9) + 8;
-      if (p >= 100) { p = 100; clearInterval(tick); setTimeout(finishLoad, 150); }
-      pctNum.textContent = p;
-      loadBar.style.width = p + "%";
-    }, 45);
-    /* safety: never trap the visitor */
-    setTimeout(function(){ if (!document.body.classList.contains("loaded")) { clearInterval(tick); finishLoad(); } }, 4000);
+    newSum();
+    if (vgEnter) vgEnter.addEventListener("click", verify);
+    if (vgAnswer) vgAnswer.addEventListener("keydown", function(e){ if (e.key === "Enter") verify(); });
+    if (vgAnswer) setTimeout(function(){ vgAnswer.focus(); }, 100);
+    /* safety: never trap the visitor — if the gate itself is missing, open the site */
+    setTimeout(function(){ if (!document.body.classList.contains("loaded") && !vgEnter) { finishLoad(); } }, 4000);
   }
 
   /* ---------- header + mobile menu ---------- */
