@@ -1484,9 +1484,6 @@
     if (vgSum) vgSum.textContent = a + " + " + b + " =";
     if (vgAnswer) vgAnswer.value = "";
   }
-  function verified(){
-    try { return sessionStorage.getItem("human-verified") === "1"; } catch (e) { return false; }
-  }
   function verify(){
     var card = document.querySelector(".vgate");
     if (card) card.classList.remove("invalid");
@@ -1502,10 +1499,9 @@
       newSum();
       return;
     }
-    try { sessionStorage.setItem("human-verified", "1"); } catch (e) {}
     finishLoad();
   }
-  if (reduced || verified()) {
+  if (reduced) {
     finishLoad();
   } else {
     newSum();
