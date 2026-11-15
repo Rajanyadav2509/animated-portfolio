@@ -73,14 +73,16 @@
   .vgate-sub{ font-size:14px; color:var(--muted); margin:0 0 22px; letter-spacing:.04em; }
   .vgate-check{ display:flex; align-items:center; justify-content:center; gap:10px; font-weight:600; color:var(--ink); cursor:pointer; background:#111; border:1px solid var(--line); border-radius:12px; padding:16px; }
   .vgate-check input{ width:20px; height:20px; accent-color:var(--red); cursor:pointer; flex:none; }
-  .vgate-math{ display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px; font-weight:600; color:var(--muted); }
-  .vgate-math span{ font-size:20px; color:var(--ink); }
-  .vgate-math input{ width:90px; padding:10px; background:#111; border:1px solid var(--line); border-radius:10px; color:var(--ink); font:inherit; text-align:center; }
-  .vgate-math input:focus{ outline:none; border-color:var(--red); }
+  .vgate-captcha{ display:flex; align-items:center; justify-content:center; gap:12px; margin-top:14px; }
+  .vgate-captcha canvas{ display:block; width:220px; height:70px; border-radius:10px; border:1px solid var(--line); }
+  .vgate-refresh{ width:44px; height:44px; flex:none; border-radius:50%; border:1px solid var(--line); background:#111; color:var(--ink); font-size:20px; cursor:pointer; line-height:1; }
+  .vgate-refresh:hover{ border-color:var(--red); color:var(--red); }
+  .vgate-captcha-input{ width:100%; margin-top:12px; padding:12px; background:#111; border:1px solid var(--line); border-radius:10px; color:var(--ink); font:inherit; text-align:center; }
+  .vgate-captcha-input:focus{ outline:none; border-color:var(--red); }
   .vgate-err{ margin:14px 0 0; color:#ff6b6b; font-weight:600; font-size:14px; }
   .vgate-btn{ margin-top:20px; width:100%; min-height:48px; border:0; cursor:pointer; font-weight:700; font-size:14px; letter-spacing:.12em; text-transform:uppercase; background:var(--red); color:#fff; clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px); transition:background .25s, transform .25s; }
   .vgate-btn:hover{ background:var(--red2); transform:translateY(-1px); }
-  .vgate.invalid .vgate-check, .vgate.invalid .vgate-math input{ border-color:#ff6b6b; }
+  .vgate.invalid .vgate-check, .vgate.invalid .vgate-captcha-input{ border-color:#ff6b6b; }
 
   /* ---------- nav ---------- */
   header{
@@ -933,7 +935,7 @@
     <h2 class="vgate-title">Verify you're human</h2>
     <p class="vgate-sub">Please confirm you're not a robot to enter the portfolio.</p>
     <label class="vgate-check"><input type="checkbox" id="vgCheck"> <span>I'm not a robot</span></label>
-    <div class="vgate-math"><span id="vgSum">3 + 4 =</span><input type="number" id="vgAnswer" inputmode="numeric" autocomplete="off" placeholder="?" aria-label="Your answer"></div>
+    <div class="vgate-captcha"><canvas id="vgCaptcha" width="220" height="70" role="img" aria-label="Captcha image. Type the characters you see."></canvas><button class="vgate-refresh" id="vgRefresh" type="button" aria-label="Get a new captcha image" title="New image">&#8635;</button></div><input type="text" id="vgAnswer" class="vgate-captcha-input" autocomplete="off" maxlength="5" placeholder="Type the characters in the image" aria-label="Type the characters shown in the image">
     <p class="vgate-err" id="vgErr" hidden></p>
     <button class="vgate-btn" id="vgEnter" type="button">Enter portfolio</button>
   </div>
@@ -1463,11 +1465,13 @@
   /* ---------- human verification gate (replaces the preloader counter) ---------- */
   var loader = document.getElementById("loader");
   var vgCheck = document.getElementById("vgCheck");
-  var vgSum = document.getElementById("vgSum");
+  var vgCaptcha = document.getElementById("vgCaptcha");
+  var vgRefresh = document.getElementById("vgRefresh");
   var vgAnswer = document.getElementById("vgAnswer");
   var vgErr = document.getElementById("vgErr");
   var vgEnter = document.getElementById("vgEnter");
-  var a = 0, b = 0;
+  var CAPTCHA_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789!@#$%&*+?=";
+  var captchaCode = "";
   function finishLoad(){
     document.body.classList.add("loaded");
     loader.classList.add("done");
@@ -1478,10 +1482,35 @@
       document.querySelectorAll(".rv:not(.in), .stat:not(.in), .wcard:not(.in)").forEach(function(el){ el.classList.add("in"); });
     }, 2600);
   }
-  function newSum(){
-    a = 2 + Math.floor(Math.random() * 8);
-    b = 2 + Math.floor(Math.random() * 8);
-    if (vgSum) vgSum.textContent = a + " + " + b + " =";
+  function drawCaptcha(){
+    if (!vgCaptcha) return;
+    var dpr = window.devicePixelRatio || 1, W = 220, H = 70;
+    vgCaptcha.width = W * dpr; vgCaptcha.height = H * dpr;
+    var ctx = vgCaptcha.getContext("2d");
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = "#f4f6fb"; ctx.fillRect(0, 0, W, H);
+    var i;
+    for (i = 0; i < 70; i++) { ctx.fillStyle = "rgba(30,60,120," + (Math.random() * .35) + ")"; ctx.beginPath(); ctx.arc(Math.random() * W, Math.random() * H, Math.random() * 1.8, 0, 7); ctx.fill(); }
+    for (i = 0; i < 5; i++) { ctx.strokeStyle = "rgba(30,60,120," + (Math.random() * .4) + ")"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.random() * W, Math.random() * H); ctx.lineTo(Math.random() * W, Math.random() * H); ctx.stroke(); }
+    var colors = ["#1e3a8a", "#0f766e", "#b91c1c", "#7c3aed", "#0369a1", "#be185d"];
+    var cw = W / captchaCode.length;
+    for (i = 0; i < captchaCode.length; i++) {
+      var size = 30 + Math.floor(Math.random() * 8);
+      ctx.save();
+      ctx.translate(cw * i + cw / 2, H / 2 + size * .32);
+      ctx.rotate((Math.random() - .5) * .55);
+      ctx.font = "700 " + size + "px Arial, sans-serif";
+      ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(captchaCode[i], 0, 0);
+      ctx.restore();
+    }
+  }
+  function newCaptcha(){
+    captchaCode = "";
+    for (var i = 0; i < 5; i++) captchaCode += CAPTCHA_CHARS[Math.floor(Math.random() * CAPTCHA_CHARS.length)];
+    drawCaptcha();
     if (vgAnswer) vgAnswer.value = "";
   }
   function verify(){
@@ -1492,11 +1521,11 @@
       if (card) card.classList.add("invalid");
       return;
     }
-    var ans = parseInt(vgAnswer && vgAnswer.value, 10);
-    if (ans !== a + b) {
-      if (vgErr) { vgErr.textContent = "That answer is not right — please try the new sum."; vgErr.hidden = false; }
+    var ans = vgAnswer ? vgAnswer.value.trim().toUpperCase() : "";
+    if (ans !== captchaCode) {
+      if (vgErr) { vgErr.textContent = "Those characters are not right — please try the new image."; vgErr.hidden = false; }
       if (card) card.classList.add("invalid");
-      newSum();
+      newCaptcha();
       return;
     }
     finishLoad();
@@ -1504,7 +1533,8 @@
   if (reduced) {
     finishLoad();
   } else {
-    newSum();
+    newCaptcha();
+    if (vgRefresh) vgRefresh.addEventListener("click", function(){ newCaptcha(); if (vgAnswer) vgAnswer.focus(); });
     if (vgEnter) vgEnter.addEventListener("click", verify);
     if (vgAnswer) vgAnswer.addEventListener("keydown", function(e){ if (e.key === "Enter") verify(); });
     if (vgAnswer) setTimeout(function(){ vgAnswer.focus(); }, 100);
