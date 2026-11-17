@@ -93,24 +93,24 @@
   header{
     position:fixed; top:0; left:0; right:0; z-index:100; width:100%; box-sizing:border-box;
     display:flex; align-items:center; justify-content:space-between; gap:16px;
-    padding:14px clamp(16px,4vw,44px);
+    padding:10px clamp(16px,4vw,44px);
     transition:background .35s ease, border-color .35s ease, padding .35s ease;
     border-bottom:1px solid transparent;
   }
-  header.scrolled{ background:rgba(6,6,7,.86); backdrop-filter:blur(14px); border-bottom-color:var(--line); padding-top:10px; padding-bottom:10px; }
+  header.scrolled{ background:rgba(6,6,7,.86); backdrop-filter:blur(14px); border-bottom-color:var(--line); padding-top:8px; padding-bottom:8px; }
   .brand{ font-family:var(--disp); font-size:20px; letter-spacing:.06em; text-decoration:none; text-transform:uppercase; }
   .brand span{ color:var(--red); }
   nav.main{ display:flex; gap:4px; }
   nav.main a{
     text-decoration:none; font-size:13px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
-    color:var(--muted); padding:10px 12px; min-height:36px; display:inline-flex; align-items:center;
+    color:var(--muted); padding:8px 12px; min-height:36px; display:inline-flex; align-items:center;
     transition:color .25s;
   }
   nav.main a:hover{ color:var(--ink); }
   nav.main a[href="#clients"]{ color:var(--red2); }
   .hire-btn{
     text-decoration:none; font-weight:700; font-size:13px; letter-spacing:.12em; text-transform:uppercase;
-    background:var(--red); color:#fff; padding:0 20px; min-height:40px; display:inline-flex; align-items:center;
+    background:var(--red); color:#fff; padding:0 20px; min-height:36px; display:inline-flex; align-items:center;
     clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
     transition:background .25s, transform .25s;
   }
@@ -145,13 +145,13 @@
   .pf-word{
     display:block; width:100%; text-align:center;
     font-family:var(--disp); font-weight:400; text-transform:uppercase;
-    font-size:clamp(72px,15vw,230px); line-height:1; letter-spacing:.02em; white-space:nowrap;
-    color:#7d0918; user-select:none; padding-top:76px;
+    font-size:clamp(72px,13vw,180px); line-height:1; letter-spacing:.02em; white-space:nowrap;
+    color:#7d0918; user-select:none; padding-top:60px;
   }
   @media (max-width:820px){ .pf-word{ font-size:clamp(48px,15vw,84px); } }
   .hero-inner{
     width:100%; max-width:1360px; margin:0 auto;
-    padding:24px clamp(18px,5vw,64px) 36px;
+    padding:16px clamp(18px,5vw,64px) 28px;
     display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(24px,4vw,56px); align-items:center;
   }
   .hero-copy{ position:relative; z-index:3; }
@@ -956,13 +956,10 @@
 <header id="siteHeader">
   <a class="brand" href="#top">Rajan<span>.</span>Yadav</a>
   <nav class="main" id="mainNav" aria-label="Main">
-    <a href="#work">Work</a>
-    <a href="#clients">Clients</a>
-    <a href="#youtube">YouTube SEO</a>
+    <a href="#top">Home</a>
     <a href="#about">About</a>
+    <a href="#clients">Clients</a>
     <a href="#services">Services</a>
-    <a href="#skills">Skills</a>
-    <a href="#system">System</a>
     <a href="#contact">Contact</a>
   </nav>
   <a class="hire-btn" href="#contact">Hire me</a>
