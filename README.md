@@ -16,3 +16,29 @@ Vercel only. Import this repo on Vercel and deploy — no server or database nee
 ## Preview
 
 ![Preview](screenshot.png)
+
+## Sections
+
+### Client work
+
+![Client work](sections/client-work.png)
+
+*Client work with real results — 100+ posts, 8+ clients and 5,786 followers.*
+
+### Client profiles
+
+![Client profiles](sections/client-profiles.png)
+
+*Client profiles with the orbit, Alexx's profile and carousel designs.*
+
+### YouTube SEO growth packs
+
+![YouTube SEO growth packs](sections/youtube-seo.png)
+
+*YouTube SEO growth packs — 100 packs across 7 channels.*
+
+### Services
+
+![Services](sections/services.png)
+
+*Eight services from the live homepage.*
