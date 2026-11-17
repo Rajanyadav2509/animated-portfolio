@@ -12,3 +12,7 @@ Rajan Yadav's new animated portfolio website — dark red and black design, insp
 ## Hosting
 
 Vercel only. Import this repo on Vercel and deploy — no server or database needed.
+
+## Preview
+
+![Preview](screenshot.png)
