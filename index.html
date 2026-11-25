@@ -380,6 +380,8 @@
 
   /* ---------- skills + toolkit ---------- */
   .skills-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px 44px; }
+  .skill-cat h3{ font-size:17px; margin:0 0 4px; }
+  .skill-cat .pills{ justify-content:flex-start; margin-top:12px; }
   .skill{ padding:6px 0 14px; border-bottom:1px solid var(--line); }
   .skill .top{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; }
   .skill .nm{ font-weight:700; font-size:15.5px; }
@@ -1126,7 +1128,7 @@
       <article class="cx">
         <div class="cx-top">
           <div><h4>Carousel 02 · The PACT Framework</h4><p class="cx-for">For Amarendra Nath Sasmal · 9 slides</p></div>
-          <div class="cx-eng"><span><b>33</b>reactions</span><span><b>32</b>comments</span><span><b>0</b>reposts</span></div>
+          <div class="cx-eng"><span><b>33</b>reactions</span><span><b>32</b>comments</span></div>
         </div>
         <div class="cx-view" tabindex="0" aria-label="PACT Framework carousel slides — scroll to see all slides">
           <div class="cx-track">
@@ -1352,15 +1354,14 @@
   <!-- SKILLS + TOOLKIT — video layout -->
   <section id="skills">
     <div class="sec-head rv">
-      <h2 class="sec-title">Core Skills<span class="dot">.</span></h2>
+      <h2 class="sec-title">Skills &amp; Tools<span class="dot">.</span></h2>
     </div>
     <div class="skills-grid" id="skillsGrid">
-      <div class="skill"><div class="top"><span class="nm">LinkedIn Content &amp; Marketing</span><span class="pc">95%</span></div><div class="track"><div class="fill" data-w="95"></div></div></div>
-      <div class="skill"><div class="top"><span class="nm">Audience Engagement</span><span class="pc">92%</span></div><div class="track"><div class="fill" data-w="92"></div></div></div>
-      <div class="skill"><div class="top"><span class="nm">Social Media Management</span><span class="pc">90%</span></div><div class="track"><div class="fill" data-w="90"></div></div></div>
-      <div class="skill"><div class="top"><span class="nm">Content Creation &amp; Design</span><span class="pc">88%</span></div><div class="track"><div class="fill" data-w="88"></div></div></div>
-      <div class="skill"><div class="top"><span class="nm">Personal Branding</span><span class="pc">86%</span></div><div class="track"><div class="fill" data-w="86"></div></div></div>
-      <div class="skill"><div class="top"><span class="nm">YouTube SEO</span><span class="pc">85%</span></div><div class="track"><div class="fill" data-w="85"></div></div></div>
+      <div class="skill-cat"><h3>Marketing</h3><ul class="pills"><li>Social Media Management</li><li>LinkedIn Marketing</li><li>YouTube SEO</li><li>Content Strategy</li></ul></div>
+      <div class="skill-cat"><h3>Content</h3><ul class="pills"><li>Content Planning</li><li>Copywriting</li><li>Post Scheduling</li><li>Community Engagement</li></ul></div>
+      <div class="skill-cat"><h3>Design</h3><ul class="pills"><li>Canva</li><li>Social Media Creatives</li><li>Thumbnail Design</li></ul></div>
+      <div class="skill-cat"><h3>Development</h3><ul class="pills"><li>HTML</li><li>CSS</li><li>JavaScript</li><li>Responsive Web Design</li></ul></div>
+      <div class="skill-cat"><h3>Tools</h3><ul class="pills"><li>GitHub</li><li>Vercel</li><li>Google Search Console</li><li>Canva</li><li>ChatGPT</li><li>Notion</li></ul></div>
     </div>
 
     <div class="toolkit rv">
